@@ -1,17 +1,18 @@
 """
-main.py
+main module
 
 This is my main application file that controls everything in my weather app.
 It manages:
-- User login and registration
-- Three weather screens (Current, Historical, Yearly)
-- All button clicks and screen changes
-- Data flow between screens
-- Charts updating
+User login and registration
+Three weather screens (Current, Historical, Yearly)
+All button clicks and screen changes
+Charts updating
 
 Used by:
-- All other modules when they need to update charts or change screens
-- Runs first when starting the app
+All other modules when they need to update charts or change screens
+
+
+Runs first when starting the app
 
 References:
 Reference for PySimpleGUI: https://www.pysimplegui.org/
@@ -22,7 +23,6 @@ Reference for Button: https://pysimplegui.readthedocs.io/en/latest/call%20refere
 Reference for popup: https://pysimplegui.readthedocs.io/en/latest/call%20reference/#popup-element
 Reference for Theme: https://pysimplegui.readthedocs.io/en/latest/call%20reference/#theme
 Reference for Try/Except: https://docs.python.org/3/tutorial/errors.html
-Reference for Object oriented: https://docs.python.org/3/tutorial/classes.html
 Reference for Event Loop: https://pysimplegui.readthedocs.io/en/latest/cookbook/#recipe-pattern-1-one-window-runs-start-to-finish
 """
 
@@ -39,7 +39,7 @@ import historical_data.historical_data as historical_data
 import yearly_comparison.yearly_comparison as yearly_comparison
 import top_command_interface.top_command_interface as top_command_interface
 
-# Import my user handling modules
+# Import my user modules
 from User.user_login import LoginView
 from User.user_register import RegisterView
 from User.user_management import UserManager
@@ -50,17 +50,15 @@ from controller.DES import fetch_weather_button
 from controller.DES import get_online_json_data
 from controller.DES import merged_data
 
-# Import chart tools
+# Import chart toolbar (i set it up in current_condition.py)
 from current_condition.current_condition import draw_figure_with_toolbar
 
 class WeatherApp:
     """
     This is my main app class that controls everything
-    It manages:
-    - Login/register screens
-    - Three weather screens
-    - All button clicks
-    - Charts and data
+    Login/register screens
+    Three weather screens
+    All button clicks and events
     """
 
     def __init__(self):
@@ -68,13 +66,13 @@ class WeatherApp:
         This sets up all the parts of my app
         
         I store:
-        user_manager: handles login/register
-        login_view: the login screen
-        register_view: the register screen
+        user_manager
+        login
+        register
         current_user: who's logged in
-        top_interface: main menu
+        top_interface
         windows: list of my three screens
-        current_window_index: which screen showing (0,1,2)
+        current_window_index: which screen showing
         figure_agg_list: charts for each screen
         json_data: data from JSNDrop
         """
@@ -92,17 +90,9 @@ class WeatherApp:
         """
         This function controls my login screen
         It shows the login window and handles what happens when users try to:
-        - Log in with username/password
-        - Click Register to make new account
-        - Exit the app
-        
-        Returns:
-        username if login works
-        None if they exit or something goes wrong
-        
-        Used by:
-        - run() function when app starts
-        - After logout to show login screen again
+        Log in with username/password
+        Click Register to make new account
+        Exit the app or close the window
         """
         while True:
             # Show login window
@@ -131,7 +121,6 @@ class WeatherApp:
         It shows the register window and makes new accounts
         
         Called by handle_login() when Register clicked
-        Gets called by main.py's handle_window_events()
         """
         self.register_view.set_up_layout()
         self.register_view.render()
@@ -146,27 +135,23 @@ class WeatherApp:
     def create_chart(self, window_index, window):
         """
         This function makes empty charts when screens first open
-        Each screen (Current/Historical/Yearly) gets its own chart
+        Each screen gets its own chart
         
         Parameters:
         window_index: which screen (0,1,2)
         window: the window to put chart in
         
-        Returns:
-        fig: the matplotlib chart
-        None: if something went wrong
-        
         Called by initialize_windows() when making screens
         """
         fig = None
-        if window_index == 0:  # Current Condition screen
+        if window_index == 0:  # Current condition screen
             fig = current_condition.create_currentCondition_chart({})
-        elif window_index == 1:  # Historical Data screen  
+        elif window_index == 1:  # Historical data screen  
             fig = historical_data.create_historical_chart()
-        elif window_index == 2:  # Yearly Comparison screen
+        elif window_index == 2:  # Yearly comparison screen
             fig = yearly_comparison.create_yearly_chart()
 
-        # Put the chart in the window if we made one
+        # Put the chart in the window if it made one
         if fig:
             canvas_elem = window["canvas-chart"]
             canvas = canvas_elem.TKCanvas
@@ -177,18 +162,13 @@ class WeatherApp:
 
     def update_chart(self, data):
         """
-        This function updates charts with new data
+        This function updates charts with the new data
         It gets called when users:
-        - Click Get Current Weather
-        - Click Compare Cities
-        - Change cities or years
+        Click Get Current weather button
+        Click Compare Cities button
         
         Parameters:
         data: dictionary with new data for chart
-        
-        Used by:
-        - handle_window_events() when handling button clicks
-        - fetch_weather_button.py after getting new data
         """
         try:
             if self.current_window_index == 0:  # Current condition screen
@@ -205,9 +185,9 @@ class WeatherApp:
                         draw_figure_with_toolbar(canvas, fig)
                     return True
             elif self.current_window_index == 1:  # Historical data screen
-                pass  # Uses its own update function
+                pass  
             elif self.current_window_index == 2:  # Yearly comparison screen
-                pass  # Uses its own update function
+                pass 
         except Exception as e:
             print(f"Error updating chart: {str(e)}")
             return False
@@ -216,20 +196,20 @@ class WeatherApp:
         """
         This function creates all my app windows at startup
         It makes:
-        - Top menu (main navigation)
-        - Current Condition screen
-        - Historical Data screen
-        - Yearly Comparison screen
+        Top menu screen
+        Current condition screen
+        Historical data screen
+        Yearly comparison screen
         
         All screens start hidden except top menu
         Each screen gets an empty chart ready
         
         Returns:
-        True: if all windows created ok
-        False: if something went wrong
+        True if all windows created ok
+        False if something went wrong
         
         Called by:
-        - run() after successful login
+        run() after successful login
         """
         try:
             # Make the top menu window first
@@ -253,9 +233,9 @@ class WeatherApp:
                 window = sg.Window(
                     "Weather App",
                     layout,
-                    finalize=True,  # Create window right away
-                    location=(500, 100),  # Where to put window
-                    resizable=True,  # Let users resize window
+                    finalize=True, 
+                    location=(1000, 300),  # Where to put window
+                    resizable=True,
                 )
                 self.windows.append(window)
 
@@ -280,41 +260,30 @@ class WeatherApp:
         """
         This function handles all button clicks and events
         It controls:
-        - Switching between screens
-        - Button clicks on all screens
-        - Chart updates
-        - Chat messages
-        
-        Parameters:
-        window: which window the event came from
-        event: what happened (button click etc)
-        values: any values from form inputs
-        
-        Returns:
-        "Logout": if they clicked logout
-        "Exit": if they're closing app
-        None: for normal events
+        Navigation between screens
+        Button clicks on all screens
+        Chart updates
+        Chat messages
         
         Called by:
-        - run() in main event loop
-        This is the heart of my app - handles everything users do!
+        run() in main event loop
         """
         try:
             # Handle top menu events
             if window == self.top_interface:
                 
-                # They clicked Current Condition
+                # They clicked current condition
                 if event == "Current Condition":
                     if self.current_window_index is not None:
                         self.windows[self.current_window_index].Hide()
                     self.current_window_index = 0  # Current Condition is screen 0
                     self.windows[self.current_window_index].UnHide()
-                    # Tell UserManager which screen we're on
+                    # Tell UserManager which screen user is on
                     result = self.user_manager.set_current_DES("DES1")
                     if result != "Set Screen":
                         sg.popup(result, title="Screen Change Error")
 
-                # They clicked Historical Data
+                # They clicked historical data
                 elif event == "Historical Data":
                     if self.current_window_index is not None:
                         self.windows[self.current_window_index].Hide()
@@ -324,7 +293,7 @@ class WeatherApp:
                     if result != "Set Screen":
                         sg.popup(result, title="Screen Change Error")
 
-                # They clicked Yearly Comparison
+                # They clicked yearly comparison
                 elif event == "Yearly Comparison":
                     if self.current_window_index is not None:
                         self.windows[self.current_window_index].Hide()
@@ -353,7 +322,7 @@ class WeatherApp:
             # Handle events from the three main screens
             elif window in self.windows:
                 
-                # They clicked Prev button
+                # Prev button
                 if event == "Prev":
                     # Hide current screen
                     self.windows[self.current_window_index].Hide()
@@ -370,7 +339,7 @@ class WeatherApp:
                     if result != "Set Screen":
                         sg.popup(result, title="Screen Change Error")
 
-                # They clicked Next button
+                # Next button
                 elif event == "Next":
                     self.windows[self.current_window_index].Hide()
                     # Go to next screen (wrap around to start if at end)
@@ -384,11 +353,11 @@ class WeatherApp:
                     if result != "Set Screen":
                         sg.popup(result, title="Screen Change Error")
 
-                # They clicked Send in chat
+                # Send in chat
                 elif event == "Send":
                     chat_button.accept(event, values, {"view": window})
 
-                # They clicked Get Current Weather
+                # Get Current Weather
                 elif event == "-FETCH-WEATHER-":
                     if self.current_window_index == 0:  # Only on Current Condition screen
                         state = {
@@ -442,19 +411,17 @@ class WeatherApp:
             """
             This is my main app function that runs everything
             It handles:
-            1. Login/register flow
-            2. Creating all windows
-            3. Main event loop for button clicks
+            Login/register flow
+            Creating all windows
+            Main event loop for button clicks
             
             The flow is:
-            - Show login until successful
-            - Create all windows
-            - Handle events until logout/exit
-            - Go back to login if they logged out
+            Show login until successful
+            Create all windows
+            Handle events until logout/exit
             
             Called by:
-            - main() when app starts
-            This is where everything starts!
+            main() when app starts
             """
             while True:
                 # First show login window
@@ -466,32 +433,30 @@ class WeatherApp:
                 # After login, create all windows
                 print("creating app windows...")
                 if not self.initialize_windows():
-                    break  # Something went wrong making windows
+                    break  # Something went wrong making the windows
 
                 # Main event loop - handle all button clicks
                 print("starting main event loop...")
                 while True:
                     try:
-                        # Wait for something to happen
                         window, event, values = sg.read_all_windows()
 
-                        # Check if they're closing app
+                        # if they're closing app
                         if event in (sg.WIN_CLOSED, "Exit"):
-                            # Close everything properly
+                            # Close everything
                             for win in self.windows:
                                 win.close()
                             if self.top_interface:
                                 self.top_interface.close()
                             return
 
-                        # Handle whatever they did
                         result = self.handle_window_events(window, event, values)
                         if result == "Logout":
                             print("user logged out - going back to login...")
                             break  # Go back to login
                         elif result == "Exit":
                             print("user exited app...")
-                            return  # Close program
+                            return  # Close 
 
                     except Exception as e:
                         sg.popup_error(f"Error in main loop: {str(e)}")
@@ -502,11 +467,11 @@ def main():
     """
     This is where my app starts
     It:
-    1. Sets the color theme
-    2. Creates the app
-    3. Runs it
+    Sets the color theme
+    Creates the app
+    Runs it
     
-    This is the entry point when running main.py
+    This is the entry point when running my main.py
     """
     # Use light green theme for all windows
     sg.theme("LightGreen")
@@ -517,6 +482,6 @@ def main():
     app.run()
 
 
-# Only run if this file is run directly
+
 if __name__ == "__main__":
     main()
