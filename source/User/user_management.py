@@ -3,20 +3,17 @@ user_management.py
 
 This is my class for managing users and chat in my weather app.
 It handles:
-- User registration and login
-- Chat messages for each screen
-- Keeping track of which screen users are on
+User registration and login
+Chat messages for each screen
+Keeping track of which screen users are on
 
 Uses JSNDrop to store:
-- User info in tblUser table
-- Chat messages in tblChatV2 table
+User info in tblUser table
+Chat messages in tblChatV2 table
 
 References:
 Reference for datetime: https://docs.python.org/3/library/datetime.html
 Reference for timestamp: https://docs.python.org/3/library/datetime.html#datetime.datetime.timestamp
-Reference for inheritance: https://docs.python.org/3/tutorial/classes.html#inheritance
-Reference for super(): https://docs.python.org/3/library/functions.html#super
-Reference for class variables: https://docs.python.org/3/tutorial/classes.html#class-and-instance-variables
 Reference for JSNDrop: Comes from Todd examples files in Moodle
 """
 
@@ -24,35 +21,28 @@ from model.network.jsn_drop_service import jsnDrop
 from datetime import datetime
 
 class UserManager(object):
-    # These class variables keep track of the current user state
-    # They're shared by all instances of UserManager
+    # These variables keep track of the current user state
     current_user = None  # Username of logged in user
     current_pass = None  # Password of logged in user
     current_status = None  # Login status (Logged In/Out)
     current_screen = None  # Which screen they're looking at
-    jsn_tok = "96d5a614-3acb-41b4-b7f6-b298368bf871"  # My JSNDrop token
+    jsn_tok = "96d5a614-3acb-41b4-b7f6-b298368bf871"
 
     def __init__(self):
         """
         This sets up my UserManager and creates needed tables
         I create:
-        - tblUser for storing user accounts
-        - tblChatV2 for storing chat messages
+        tblUser for storing user accounts
+        tblChatV2 for storing chat messages
         """
         super().__init__()
         # Connect to JSNDrop service
         self.jsnDrop = jsnDrop(UserManager.jsn_tok, "https://newsimland.com/~todd/JSON")
-
-        # Create user table if it doesn't exist
-        # The table stores:
-        # - PersonID: username (primary key)
-        # - Password: user's password
-        # - Status: whether they're logged in
         result = self.jsnDrop.create(
             "tblUser",
             {
-                "PersonID PK": "A_LOOONG_NAME" + ("X" * 50),  # Make room for long names
-                "Password": "A_LOOONG_PASSWORD" + ("X" * 50),  # Make room for long passwords
+                "PersonID PK": "A_LOOONG_NAME" + ("X" * 50),
+                "Password": "A_LOOONG_PASSWORD" + ("X" * 50),
                 "Status": "STATUS_STRING",  # Logged In/Out/Registered
             },
         )
@@ -64,13 +54,6 @@ class UserManager(object):
         """
         This registers a new user if the username isn't taken
         
-        Parameters:
-        user_id: username they want
-        password: password they want
-        
-        Returns:
-        "Registration Success" if it worked
-        "User Already Exists" if username taken
         """
         api_result = self.jsnDrop.select("tblUser", f"PersonID = '{user_id}'")
         if "DATA_ERROR" in self.jsnDrop.jsnStatus:  # Username not found
@@ -87,21 +70,17 @@ class UserManager(object):
         This checks login info and logs user in if correct
         
         Parameters:
-        user_id: username to check
-        password: password to check
-        
-        Returns:
-        "Login Success" if worked
-        "Login Failed" if wrong info
+        user_id
+        password
         """
         api_result = self.jsnDrop.select(
             "tblUser", f"PersonID = '{user_id}' AND Password = '{password}'"
         )
-        if "DATA_ERROR" in self.jsnDrop.jsnStatus:  # Wrong info
+        if "DATA_ERROR" in self.jsnDrop.jsnStatus:
             UserManager.current_status = "Logged Out"
             UserManager.current_user = None
             return "Login Failed"
-        else:  # Correct info
+        else:
             UserManager.current_status = "Logged In"
             UserManager.current_user = user_id
             UserManager.current_pass = password
@@ -116,9 +95,9 @@ class UserManager(object):
         This logs out the current user
         
         Returns:
-        "Logged Out" if worked
+        Logged Out if worked
         Error message if something went wrong
-        "Must be 'Logged In' to 'LogOut'" if not logged in
+        "Must be Logged In to LogOut
         """
         if UserManager.current_status == "Logged In":
             api_result = self.jsnDrop.store(
@@ -159,7 +138,7 @@ class UserManager(object):
             UserManager.current_screen = DESScreen
             result = "Set Screen"
         else:
-            result = "Log in to set the current screen"
+            result = "Log in"
         return result
 
     def get_current_screen(self):
@@ -170,12 +149,10 @@ class UserManager(object):
         """
         This creates the chat table if it doesn't exist
         The table stores:
-        - PersonID: who sent the message
-        - DESNumber: which screen it's for
-        - Chat: the message text
-        - Time: when it was sent
-        
-        I removed PK from PersonID so users can send multiple messages
+        PersonID: who sent the message
+        DESNumber: which screen it's for
+        Chat: the message text
+        Time: when it was sent
         """
         result = self.jsnDrop.create(
             "tblChatV2",
@@ -193,18 +170,17 @@ class UserManager(object):
         This saves a new chat message
         
         Parameters:
-        message: what they wrote
+        message
         
         Returns:
-        "Chat sent" if worked
+        Chat sent if worked
         Error message if something went wrong
-        "You must be logged in to chat" if not logged in
         """
         result = None
         if UserManager.current_status != "Logged In":
             result = "You must be logged in to chat"
         elif UserManager.current_screen == None:
-            result = "Chat not sent. A current screen must be set before sending chat"
+            result = "Chat not sent. A current screen must be set before sending chat - just testing"
         else:
             # Save message with current time and screen
             user_id = UserManager.current_user
@@ -228,9 +204,9 @@ class UserManager(object):
 
     def get_chat(self):
         """
-        This gets all chat messages for current screen
+        This gets all chat messages for thre current screen
         Messages are sorted by time so they show in order
-        Returns None if not logged in or no current screen
+        I use lambda to sort by time with float conversion
         """
         result = None
         if UserManager.current_status == "Logged In":

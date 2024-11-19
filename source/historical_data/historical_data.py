@@ -1,18 +1,18 @@
 """
-historical_data.py
+historical data screen
 
-This is my module for the Historical Data screen.
+This is my module for the historical data screen.
 It shows yearly weather data for cities and lets users compare NZ and Canadian cities.
 The data comes from different sources:
-- NZ data from WeatherData.csv via get_online_json_data.py
-- Canadian data from CanadianWeatherData.csv via merged_data.py
+NZ data from WeatherData.csv via get_online_json_data.py
+Canadian data from CanadianWeatherData.csv via merged_data.py
 
 Used by main.py to create and manage the historical data screen.
 Works with these controllers:
-- get_local_data.py for the city lists and CSV operations
-- get_online_json_data.py for getting NZ data from JSNDrop
-- merged_data.py for comparing cities
-- chat_button.py for the chat functionality
+get_local_data.py for the city lists and CSV operations
+get_online_json_data.py for getting NZ data from JSNDrop
+merged_data.py for comparing cities
+chat_button.py for the chat functionality
 
 References:
 Reference for PySimpleGUI: https://www.pysimplegui.org/
@@ -21,7 +21,7 @@ Reference for subplot: https://matplotlib.org/stable/api/_as_gen/matplotlib.pypl
 Reference for plot: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.plot.html
 Reference for grid: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.grid.html
 Reference for TkAgg: https://matplotlib.org/stable/users/explain/backends.html
-Reference for Toolbar: https://matplotlib.org/stable/api/backend_tools_api.html
+Reference for Toolbar: https://matplotlib.org/stable/gallery/user_interfaces/embedding_in_tk_sgskip.html
 Reference for Multiline: https://pysimplegui.readthedocs.io/en/latest/call%20reference/#multiline-element
 """
 
@@ -39,20 +39,11 @@ def draw_figure_with_toolbar(canvas, fig):
     This function puts a matplotlib chart in my PySimpleGUI window
     It adds zoom and pan tools to the chart
     
-    Parameters:
-    canvas: where to draw the chart (from PySimpleGUI)
-    fig: the chart to draw (from matplotlib)
-    
-    Used by:
-    - handle_json_fetch() when showing NZ data
-    - handle_merge_event() when showing comparison
-    - current_condition.py for its charts
-    - yearly_comparison.py for its charts
     """
     import matplotlib
-    matplotlib.use("TkAgg")  # Need this to show charts in PySimpleGUI
+    matplotlib.use("TkAgg") 
 
-    # Clear old chart if any
+    # Clear old chart if any ( i was getting an error without it)
     if canvas.children:
         for child in canvas.winfo_children():
             child.destroy()
@@ -62,9 +53,10 @@ def draw_figure_with_toolbar(canvas, fig):
     figure_canvas_agg.draw()
     figure_canvas_agg.get_tk_widget().pack(side="top", fill="both", expand=1)
 
-    # Add toolbar with zoom and pan tools
+    # Add toolbar with zoom and pan tools , it is a built in feature of matplotlib
+
     toolbar_frame = sg.tk.Frame(canvas)
-    toolbar_frame.pack(side="bottom", fill="x")
+    toolbar_frame.pack(side="bottom", fill="x") 
     toolbar = NavigationToolbar2Tk(figure_canvas_agg, toolbar_frame)
     toolbar.update()
 
@@ -74,29 +66,28 @@ def historical_des_layout():
     """
     This function creates the layout for my Historical Data screen
     It has:
-    - Navigation buttons (Prev/Next)
-    - City selection dropdowns
-    - Year selector
-    - Chart area
-    - Get JSON and Create Merged Data buttons
-    - Chat section at bottom
+    navigation buttons (Prev/Next)
+    City selection dropdowns
+    Year selector
+    Chart area
+    Get JSON and Create Merged Data buttons
+    Chat section at bottom
     
     Used by:
-    - main.py to create the screen
-    - All buttons reference the keys defined here
+    main.py to create the screen
     """
-    figure_w, figure_h = 700, 450  # Size of chart area
+    figure_w, figure_h = 700, 450
 
     layout = [
         # Top navigation
         [
             sg.Button("Prev"),
             sg.Text("Historical Data", font=("Arial", 22),
-                   justification="center", expand_x=True),
+                justification="center", expand_x=True),
             sg.Button("Next"),
         ],
         
-        # Data type selector (only Temperature for now)
+        # Data type (only Temperature for now)
         [
             sg.Text("Data type:"),
             sg.Combo(["Temperature"], default_value="Temperature",
@@ -108,11 +99,11 @@ def historical_des_layout():
         [
             sg.Frame("New Zealand City", [
                 [sg.Combo(NZ_CITIES, default_value="Nelson",
-                         key="-NZ-CITY-", readonly=True, size=(20, 1))]
+                        key="-NZ-CITY-", readonly=True, size=(20, 1))]
             ]),
             sg.Frame("Canadian City", [
                 [sg.Combo(CANADIAN_CITIES, default_value="Toronto",
-                         key="-CANADIAN-CITY-", readonly=True, size=(20, 1))]
+                        key="-CANADIAN-CITY-", readonly=True, size=(20, 1))]
             ]),
         ],
         
@@ -127,7 +118,7 @@ def historical_des_layout():
         
         # Chart area
         [sg.Canvas(size=(figure_w, figure_h), key="canvas-chart",
-                  pad=(0, (10, 20)))],
+                pad=(0, (10, 20)))],
         
         # Action buttons
         [
@@ -139,8 +130,8 @@ def historical_des_layout():
         
         # Chat section
         [sg.Multiline(size=(60, 5), expand_x=True,
-                     key="-CHATBOX-HISTORICAL-DATA-",
-                     disabled=True, autoscroll=True)],
+                    key="-CHATBOX-HISTORICAL-DATA-",
+                    disabled=True, autoscroll=True)],
         [sg.Input(size=(60, 3), expand_x=True, key="Message")],
         [sg.Push(), sg.Button("Send"), sg.Push()],
         
@@ -150,51 +141,41 @@ def historical_des_layout():
     return layout
 
 def create_historical_chart(nz_data=None, canadian_data=None,
-                          nz_city=None, canadian_city=None):
+                        nz_city=None, canadian_city=None):
     """
     This function creates the historical weather chart
     It can show:
-    - Just NZ city data
-    - Both NZ and Canadian data for comparison
-    - Example data if no real data yet
-    
-    Parameters:
-    nz_data: list of temperatures for NZ city (optional)
-    canadian_data: list of temperatures for Canadian city (optional)
-    nz_city: name of NZ city (optional)
-    canadian_city: name of Canadian city (optional)
-    
-    Used by:
-    - handle_json_fetch() when showing NZ data
-    - handle_merge_event() when showing comparison
+    Just NZ city data
+    Both NZ and Canadian data for comparison
+    Example data if no real data yet (for testing)
     """
     print("making new historical chart...")
-    plt.clf()  # Clear any old chart
+    plt.clf() 
     fig, ax = plt.subplots(figsize=(10, 4))
 
-    # List of months for x-axis
+    # List of months for my x-axis
     months = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ]
 
-    # Plot NZ data in blue with circles (if we have it)
+    # Plot NZ data
     if nz_data:
         ax.plot(months[:len(nz_data)], nz_data, label=f"{nz_city}",
-               color="#2196F3", marker="o", linestyle="-")
+            color="#2196F3", marker="o", linestyle="-")
 
-    # Plot Canadian data in green with squares (if we have it)
+    # Plot Canadian data
     if canadian_data:
         ax.plot(months[:len(canadian_data)], canadian_data,
-               label=f"{canadian_city}", color="#4CAF50",
-               marker="s", linestyle="-")
+            label=f"{canadian_city}", color="#4CAF50",
+            marker="s", linestyle="-")
 
     # Show example data if no real data yet
     if not (nz_data or canadian_data):
         values = [15, 17, 14, 12, 10, 8, 7, 9, 11, 13, 14, 15]
         ax.plot(months, values, label="Example Data")
 
-    # Choose title based on what data we're showing
+    # Choose title based on what data i'm showing on the chart
     title = "Temperature History"
     if nz_city and canadian_city:
         title = f"Temperature Comparison: {nz_city} vs {canadian_city}"
@@ -207,11 +188,11 @@ def create_historical_chart(nz_data=None, canadian_data=None,
     ax.set_xlabel("Months")
     ax.grid(True, linestyle="--", alpha=0.7)
 
-    # Add legend if we have data
+    # Add legend if have data
     if nz_data or canadian_data:
         ax.legend()
 
-    plt.tight_layout()  # Make everything fit nicely
+    plt.tight_layout() 
     print("historical chart is ready")
     return fig
 
@@ -222,11 +203,11 @@ def handle_json_fetch(window, values):
     Shows the data for one NZ city on the chart
     
     Called when someone clicks Get JSON Data button
-    Button event is handled in main.py
+    Button event is handled in my main.py
     """
     try:
         result = get_online_json_data.accept("-FETCH-JSON-", values,
-                                           {"view": window})
+                                        {"view": window})
         if result:
             fig = create_historical_chart(nz_data=result,
                                         nz_city=values["-NZ-CITY-"])
@@ -242,14 +223,14 @@ def handle_json_fetch(window, values):
 def handle_merge_event(window, values, json_data):
     """
     This function handles the Create Merged Data button click
-    It uses merged_data.py to:
-    1. Get NZ data from JSNDrop
-    2. Get Canadian data from CSV
-    3. Combine them into one dataset
-    4. Show both on the same chart
+    It uses merged_data.py controller to:
+    Get NZ data from JSNDrop
+    Get Canadian data from CSV
+    Combine them into one dataset
+    Show both on the same chart
     
     Called when someone clicks Create Merged Data button
-    Button event is handled in main.py
+    Button event is handled in my main.py
     """
     try:
         result = merged_data.accept("-MERGE-DATA-", values, {"view": window})

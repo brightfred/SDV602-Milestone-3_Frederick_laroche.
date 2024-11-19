@@ -1,16 +1,15 @@
 """
-top_command_interface.py
+top command interface screen
 
 This is my module for the main menu window of my weather app.
 It creates a window with buttons to open each screen:
 Current Condition screen
 Historical Data screen
 Yearly Comparison screen
-Exit button to close app
+Exit button to close the app
 
 This module is used by:
-- main.py to create the main menu
-- User screens use these button names to handle navigation
+my main.py to create the main menu window
 
 References:
 Reference for PySimpleGUI: https://www.pysimplegui.org/
@@ -30,35 +29,29 @@ def create_top_interface():
     """
     This function creates my main menu window with navigation buttons
     
-    The layout has:
-    - Title at top
-    - Three big buttons for each screen
-    - Exit button at bottom
-    
-    I use sg.Push() to center everything nicely
+    I use sg.Push() to center everything
     
     The buttons are used by:
-    - Current Condition: Opens the current weather screen
-    - Historical Data: Opens the historical comparison screen
-    - Yearly Comparison: Opens the yearly comparison screen
-    - Exit: Closes the whole app
+    Current Condition: Opens the current weather screen
+    Historical Data: Opens the historical comparison screen
+    Yearly Comparison: Opens the yearly comparison screen
+    Exit: Closes the whole app
     
-    Used by main.py when starting the app
+    Used by my main.py when starting the app
     """
     # Create the layout for my main menu
     layout = [
-        # Title at the top
         [sg.Text('Weather Data App',
-                font=('Arial', 20),  # Big font for title
-                justification='center',  # Center the text
+                font=('Arial', 20),  
+                justification='center',  
                 expand_x=True)],  # Make it use full width
         
         # Button for Current Condition screen
-        [sg.Push(),  # Push to center
+        [sg.Push(),
         sg.Button('Current Condition',
                 size=(20, 2),  # Width=20, Height=2
-                font=('Arial', 14)),  # Nice readable font
-        sg.Push()],  # Push to center
+                font=('Arial', 14)),  
+        sg.Push()],
         
         # Button for Historical Data screen
         [sg.Push(),
@@ -77,7 +70,7 @@ def create_top_interface():
         # Exit button at bottom
         [sg.Push(),
         sg.Button('Exit',
-                size=(10, 2),  # Smaller than other buttons
+                size=(10, 2),
                 font=('Arial', 14)),
         sg.Push()]
     ]
@@ -86,7 +79,7 @@ def create_top_interface():
     top_command_interface_window = sg.Window(
         'Top Command Interface',  # Window title
         layout,  # The layout i made above
-        size=(300, 400),  # Window size: width=300, height=400
+        size=(300, 400),  # width=300, height=400
         location=(None, None),  # Let Windows choose where to put it
     )
     

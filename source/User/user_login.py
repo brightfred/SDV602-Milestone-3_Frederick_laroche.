@@ -1,11 +1,11 @@
 """
-user_login.py
+user login class 
 
 This is my login window class. It creates and manages the login screen.
 It works with these controllers:
-- login_button.py to handle login attempts
-- register_window_button.py to open register window
-- exit_button.py to handle closing
+login_button.py to handle login attempts
+register_window_button.py to open register window
+exit_button.py to handle closing
 
 Used by:
 - main.py to show login screen at startup
@@ -39,7 +39,6 @@ class LoginView(object):
         I store:
         window: the PySimpleGUI window (None until created)
         layout: list for window layout (empty at start)
-        components: dictionary of GUI elements
         controls: list of button handlers
         result: what to return from login attempt
         """
@@ -53,11 +52,11 @@ class LoginView(object):
         """
         This creates my login window layout
         It has:
-        - Username input box
-        - Password input box (shows * for typing)
-        - Login button
-        - Register button (opens register window)
-        - Exit button
+        Username input box
+        Password input box (shows * for typing)
+        Login button
+        Register button (opens register window)
+        Exit button
         
         Each button gets a controller from my imported modules
         """
@@ -77,7 +76,7 @@ class LoginView(object):
             size=(20, 1)
         )
 
-        # Create buttons and add their controllers
+        # Create buttons and add the controllers
         # Login button
         self.components["Login"] = sg.Button(
             button_text="Login",
@@ -103,7 +102,6 @@ class LoginView(object):
             self.components["exit_button"],
         ]
 
-        # Add header text
         self.components["header"] = sg.Text(
             "Weather App Login",
             font=("current 18")
@@ -111,12 +109,12 @@ class LoginView(object):
 
         # Create the whole layout
         self.layout = [
-            [self.components["header"]],  # First row: header
+            [self.components["header"]],  
             [sg.Text("User Name:", size=(10, 1)),
-            self.components["User"]],  # Second row: username
+            self.components["User"]], 
             [sg.Text("Password:", size=(10, 1)),
-            self.components["Password"]],  # Third row: password
-            row_buttons,  # Fourth row: all buttons
+            self.components["Password"]],  
+            row_buttons,
         ]
 
     def render(self):
@@ -128,22 +126,21 @@ class LoginView(object):
             self.window = sg.Window(
                 "Login",  # Window title
                 self.layout,
-                grab_anywhere=False,  # Don't let window be dragged
+                grab_anywhere=True, 
                 finalize=True,  # Create window right away
-                return_keyboard_events=True,  # Catch keyboard input
+                return_keyboard_events=True,  # keyboard input (i was forgetting my password too much) 
                 location=(300, 200)  # Where to put window
             )
 
     def accept_input(self):
         """
         This handles all the window events (button clicks etc)
-        It runs until user logs in, registers, or exits
+        It runs until user logs in, registers or exits
         Returns the result (like username/password if login works)
         """
         if self.window is not None:
             keep_going = True
             while keep_going:
-                # Wait for something to happen
                 event, values = self.window.read()
                 print(f"Login window event: {event}")  # Help me debug
 
@@ -158,7 +155,7 @@ class LoginView(object):
                     if not keep_going:
                         break
 
-            # Clean up and return result
+            # Return result
             self.window.close()
             print(f"Login result: {self.result}")  # Help me debug
             return self.result
@@ -188,7 +185,7 @@ class LoginView(object):
     def close(self):
         """
         This closes the window properly
-        Makes sure window is set to None after closing
+        Makes sure that the window is set to none after closing 
         """
         if self.window:
             self.window.close()

@@ -1,14 +1,14 @@
 """
-user_register.py
+user register window class
 
 This is my register window class. It creates and manages the registration screen.
 It works with these controllers:
-- register_button.py to handle registration attempts
-- exit_button.py to handle closing
+register_button.py to handle registration process
+exit_button.py to handle closing events
 
 Used by:
-- main.py through LoginView when Register button is clicked
-- Lets new users create an account
+main.py when Register button is clicked
+
 
 References:
 Reference for PySimpleGUI: https://www.pysimplegui.org/
@@ -29,13 +29,6 @@ class RegisterView(object):
         """
         This sets up my register window with empty values
         Everything gets created when set_up_layout() is called
-        
-        I store:
-        window: the PySimpleGUI window (None until created)
-        layout: list for window layout (empty at start)
-        components: dictionary of GUI elements
-        controls: list of button handlers
-        result: what to return from registration attempt
         """
         self.window = None
         self.layout = []
@@ -47,10 +40,10 @@ class RegisterView(object):
         """
         This creates my register window layout
         It has:
-        - Username input box
-        - Password input box (shows * for typing)
-        - Register button (tries to create account)
-        - Exit button
+        Username input box
+        Password input box (shows * for typing)
+        Register button (tries to create account)
+        Exit button
         
         Each button gets a controller from my imported modules
         """
@@ -96,12 +89,12 @@ class RegisterView(object):
 
         # Create the whole layout
         self.layout = [
-            [self.components["header"]],  # First row: header
+            [self.components["header"]],
             [sg.Text("User Name:", size=(10, 1)),
-             self.components["User"]],  # Second row: username
+            self.components["User"]],
             [sg.Text("Password:", size=(10, 1)),
-             self.components["Password"]],  # Third row: password
-            row_buttons,  # Fourth row: all buttons
+            self.components["Password"]],
+            row_buttons,
         ]
 
     def render(self):
@@ -113,8 +106,8 @@ class RegisterView(object):
             self.window = sg.Window(
                 "Register",  # Window title
                 self.layout,
-                grab_anywhere=False,  # Don't let window be dragged
-                finalize=True  # Create window right away
+                grab_anywhere=True,
+                finalize=True
             )
 
     def accept_input(self):
@@ -128,18 +121,15 @@ class RegisterView(object):
         if self.window is not None:
             keep_going = True
             while keep_going:
-                # Wait for something to happen
                 event, values = self.window.read()
-                # Let each controller handle the event
+                # Let each controller handle the event using a loop
                 for accept_control in self.controls:
                     keep_going = accept_control(event, values, {"view": self})
-            # Clean up and return result
             self.window.close()
             return self.result
 
     def set_result(self, result):
         """
         This saves the registration result (like username/password)
-        Used by register_button.py when registration works
         """
         self.result = result

@@ -1,24 +1,23 @@
 """
-yearly_comparison.py
+yearly comparison screen
 
-This is my module for the Yearly Comparison screen.
+This is my module for the yearly comparison screen.
 It shows yearly weather data and lets users compare NZ and Canadian cities.
 The data comes from different sources:
-- NZ data from WeatherData.csv via get_online_json_data.py
-- Canadian data from CanadianWeatherData.csv via merged_data.py
+NZ data from WeatherData.csv by get_online_json_data.py
+Canadian data from CanadianWeatherData.csv by merged_data.py
 
-Used by main.py to create and manage the yearly comparison screen.
+Used by my main.py to create and manage the yearly comparison screen.
 Works with these controllers:
-- get_local_data.py for the city lists
-- get_online_json_data.py for getting NZ data from JSNDrop
-- merged_data.py for comparing cities
-- chat_button.py for the chat functionality
+get_local_data.py for the city lists
+get_online_json_data.py for getting NZ data from JSNDrop
+merged_data.py for comparing cities
+chat_button.py for the chat functionality
 
-References:
 Reference for PySimpleGUI: https://www.pysimplegui.org/
 Reference for matplotlib: https://matplotlib.org/
 Reference for subplot: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.subplot.html
-Reference for toolbar: https://matplotlib.org/stable/api/backend_tools_api.html
+Reference for toolbar: https://matplotlib.org/stable/gallery/user_interfaces/embedding_in_tk_sgskip.html
 Reference for grid: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.grid.html
 Reference for plt.clf: https://matplotlib.org/stable/api/_as_gen/matplotlib.pyplot.clf.html
 Reference for TkAgg: https://matplotlib.org/stable/users/explain/backends.html
@@ -38,19 +37,9 @@ def draw_figure_with_toolbar(canvas, fig):
     """
     This function puts a matplotlib chart in my PySimpleGUI window
     It adds zoom and pan tools to the chart
-    
-    Parameters:
-    canvas: where to draw the chart (from PySimpleGUI)
-    fig: the chart to draw (from matplotlib)
-    
-    Used by:
-    - handle_json_fetch() when showing NZ data
-    - handle_merge_event() when showing comparison
-    - current_condition.py for its charts
-    - historical_data.py for its charts
     """
     import matplotlib
-    matplotlib.use("TkAgg")  # Need this to show charts in PySimpleGUI
+    matplotlib.use("TkAgg") 
 
     # Clear old chart if any
     if canvas.children:
@@ -74,18 +63,17 @@ def yearly_des_layout():
     """
     This function creates the layout for my Yearly Comparison screen
     It has:
-    - Navigation buttons (Prev/Next)
-    - City selection dropdowns
-    - Year selector
-    - Chart area
-    - Get JSON Drop Data and Get (NZ+CAN) Merged Data buttons
-    - Chat section at bottom
+    Navigation buttons (Prev/Next)
+    City selection dropdowns
+    Year selector
+    Chart area
+    Get JSON Drop Data and Get (NZ+CAN) Merged Data buttons
+    Chat section at bottom
     
     Used by:
-    - main.py to create the screen
-    - All buttons reference the keys defined here
+    main.py to create the screen
     """
-    figure_w, figure_h = 700, 450  # Size of chart area
+    figure_w, figure_h = 700, 450
 
     layout = [
         # Top navigation
@@ -100,7 +88,7 @@ def yearly_des_layout():
         [
             sg.Text("Data type:"),
             sg.Combo(["Temperature"], default_value="Temperature",
-                    readonly=True, key="-DATATYPE-"),
+                readonly=True, key="-DATATYPE-"),
         ],
         
         # City selection dropdowns
@@ -108,11 +96,11 @@ def yearly_des_layout():
         [
             sg.Frame("New Zealand City", [
                 [sg.Combo(NZ_CITIES, default_value="Nelson",
-                        key="-NZ-CITY-", readonly=True, size=(20, 1))]
+                key="-NZ-CITY-", readonly=True, size=(20, 1))]
             ]),
             sg.Frame("Canadian City", [
                 [sg.Combo(CANADIAN_CITIES, default_value="Toronto",
-                        key="-CANADIAN-CITY-", readonly=True, size=(20, 1))]
+                key="-CANADIAN-CITY-", readonly=True, size=(20, 1))]
             ]),
         ],
         
@@ -121,7 +109,7 @@ def yearly_des_layout():
             sg.Push(),
             sg.Text("Year:"),
             sg.Combo(AVAILABLE_YEARS, default_value="2023",
-                    key="-YEAR-", readonly=True, size=(10, 1)),
+                key="-YEAR-", readonly=True, size=(10, 1)),
             sg.Push(),
         ],
         
@@ -155,48 +143,44 @@ def create_yearly_chart(nz_data=None, canadian_data=None,
     """
     This function creates the yearly comparison chart
     It can show:
-    - Just NZ city data
-    - Both NZ and Canadian data for comparison
-    - Example data if no real data yet
+    Just NZ city data
+    Both NZ and Canadian data for comparison
+    Example data if no data yet
     
     Parameters:
-    nz_data: list of temperatures for NZ city (optional)
-    canadian_data: list of temperatures for Canadian city (optional)
-    nz_city: name of NZ city (optional)
-    canadian_city: name of Canadian city (optional)
-    
-    Used by:
-    - handle_json_fetch() when showing NZ data
-    - handle_merge_event() when showing comparison
+    nz_data: list of temperatures for NZ city 
+    canadian_data: list of temperatures for Canadian city
+    nz_city: name of NZ city
+    canadian_city: name of Canadian city
     """
     print("making new yearly chart...")
     plt.clf()  # Clear any old chart
     fig, ax = plt.subplots(figsize=(10, 4))
 
-    # List of months for x-axis
+    # List of months for my x-axis
     months = [
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
         "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     ]
 
-    # Plot NZ data in blue with circles (if we have it)
+    # Plot NZ data
     if nz_data:
         ax.plot(months[:len(nz_data)], nz_data,
             label=f"{nz_city}",
             color="#2196F3", marker="o", linestyle="-")
 
-    # Plot Canadian data in green with squares (if we have it)
+    # Plot Canadian data
     if canadian_data:
         ax.plot(months[:len(canadian_data)], canadian_data,
             label=f"{canadian_city}",
             color="#4CAF50", marker="s", linestyle="-")
 
-    # Show example data if no real data yet
+    # Show example data if no data yet
     if not (nz_data or canadian_data):
         values = [15, 17, 14, 12, 10, 8, 7, 9, 11, 13, 14, 15]
         ax.plot(months, values, label="Example Data")
 
-    # Set title based on what we're showing
+    # Set title based on what i'm showing
     title = "Temperature Comparison"
     if nz_city and canadian_city:
         title = f"Temperature Comparison: {nz_city} vs {canadian_city}"
@@ -211,25 +195,25 @@ def create_yearly_chart(nz_data=None, canadian_data=None,
     if nz_data or canadian_data:
         ax.legend()
 
-    plt.tight_layout()  # Make everything fit nicely
+    plt.tight_layout()
     print("yearly chart is ready")
     return fig
 
 def handle_json_fetch(window, values):
     """
     This function handles the Get JSON Drop Data button click
-    It gets NZ data from JSNDrop using get_online_json_data.py
+    It gets NZ data from JSNDrop using my get_online_json_data.py
     Shows the data for one NZ city on the chart
     
     Called when someone clicks Get JSON Drop Data button
-    Button event is handled in main.py
+    Button event is handled in my main.py
     """
     try:
         result = get_online_json_data.accept("-FETCH-JSON-", values,
-                                        {"view": window})
+                {"view": window})
         if result:
             fig = create_yearly_chart(nz_data=result,
-                                    nz_city=values["-NZ-CITY-"])
+                nz_city=values["-NZ-CITY-"])
             canvas_elem = window["canvas-chart"]
             canvas = canvas_elem.TKCanvas
             if canvas:
@@ -241,14 +225,14 @@ def handle_json_fetch(window, values):
 
 def handle_merge_event(window, values, json_data):
     """
-    This function handles the Get (NZ+CAN) Merged Data button click
+    This function handles the merged data button click
     It uses merged_data.py to:
-    1. Get NZ data from JSNDrop
-    2. Get Canadian data from CSV
-    3. Combine them into one dataset
-    4. Show both on the same chart
+    Get NZ data from JSNDrop
+    Get Canadian data from CSV
+    Combine them into one dataset
+    Show both on the same chart
     
-    Called when someone clicks Get (NZ+CAN) Merged Data button
+    Called when someone clicks the merged button
     Button event is handled in main.py
     """
 
